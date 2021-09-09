@@ -72,11 +72,8 @@ module afu
    t_ccip_c0_ReqMmioHdr mmio_hdr;
    assign mmio_hdr = t_ccip_c0_ReqMmioHdr'(rx.c0.hdr);
    
-   // Logic Con
-   logic en = rx.c0.mmioWrValid & (mmio_hdr.address == 16'h0020);
-   
    // Instance of fifo
-   fifo iFIFO(clk, !rst, en, user_reg, user_reg_out);
+   fifo iFIFO(clk, !rst, (rx.c0.mmioWrValid & (mmio_hdr.address == 16'h0020)), user_reg, user_reg_out);
 
    // =============================================================//   
    // MMIO write code
