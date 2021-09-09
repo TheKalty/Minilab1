@@ -73,7 +73,7 @@ module afu
    assign mmio_hdr = t_ccip_c0_ReqMmioHdr'(rx.c0.hdr);
    
    // Instance of fifo
-   fifo iFIFO(clk, !rst, (rx.c0.mmioWrValid & (mmio_hdr.address == 16'h0020)), user_reg, user_reg_out);
+   fifo iFIFO(.clk(clk), .rst_n(!rst), .en((rx.c0.mmioWrValid & (mmio_hdr.address == 16'h0020))), .d(user_reg), .q(user_reg_out));
 
    // =============================================================//   
    // MMIO write code
