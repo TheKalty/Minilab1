@@ -16,19 +16,27 @@ module fifo
   // your RTL code here
   
   // Cache Queue
-  reg [DEPTH*BITS-1:0] queue;
+  reg [BITS-1:0] queue [DEPTH-1:0];
   
   // Reg Control
+  integer x;
   always_ff @(posedge clk) begin
-	if (!rst_n)
-		queue <= 0;
+	if (!rst_n) begin
+		for (x = 0; x < DEPTH; x++) begin
+			queue[x] <= 0;
+		end
+	end
 		
-	else if (en)
-		queue = {queue[(DEPTH-1)*BITS-1:0], d};
+	else if (en) begin
+		for (x = 1; x < DEPTH; x++) begin
+			queue[x] <= queue[x-1];
+		end
+		queue[0] <= d;
+	end
   
   end
   
   // Assign output
-  assign q = queue[DEPTH*BITS-1:(DEPTH-1)*BITS];
+  assign q = queue[DEPTH-1];
   
 endmodule // fifo
