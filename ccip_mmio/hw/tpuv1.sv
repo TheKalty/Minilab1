@@ -84,7 +84,7 @@ module tpuv1
 		.Bout(memBOut)
 		);
 	
-	systolic_array#(.BITS_AB(BITS_AB), .BITS_C(BITS_C), .DIM(DIM)) iSYSARRY(
+	systolic_array #(.BITS_AB(BITS_AB), .BITS_C(BITS_C), .DIM(DIM)) iSYSARRY(
 		.clk(clk),
 		.rst_n(rst_n),
 		.WrEn(write_c),
