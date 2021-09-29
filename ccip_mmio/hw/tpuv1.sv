@@ -26,7 +26,6 @@ module tpuv1
 	wire signed [BITS_C-1:0] macCOut[DIM-1:0];
 	
 	logic [DATAW-1:0] readC;
-	logic [BITS_C-1:0] packedReadC[(DIM/2)-1:0];
 	assign dataOut = readC;
 	
 	// Regs for counter

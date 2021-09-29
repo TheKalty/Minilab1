@@ -32,7 +32,7 @@ module memA
 	assign Aout[0] = interA[0];
 	generate
 		for (x = 1; x < DIM; x++) begin
-			fifo #(.DEPTH(x), .BITS(BITS_AB)) iFIFOA [DIM-1:0](
+			fifo #(.DEPTH(x), .BITS(BITS_AB)) iFIFOA [DIM-1:1](
 				.clk(clk),
 				.rst_n(rst_n),
 				.en(en),
