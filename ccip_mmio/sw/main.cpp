@@ -256,7 +256,8 @@ int main(int argc, char *argv[]) {
 	// END
 	auto finish = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> elapsed = finish - start;
-	fprintf(stdout, "Elapsed: %d", elapsed.count());
+	fprintf(stdout, "Elapsed: %f\n", elapsed.count());
+	fprintf(stdout, "GOPS %f\n", (2*(DIM_FULL*DIM_FULL*DIM_FULL))/elapsed.count()/1000000000);
 
 	// Compare.
 	fprintf(stdout, "Calculation finished. Testing values...\n");
@@ -264,10 +265,10 @@ int main(int argc, char *argv[]) {
 	{
 		for(int c = 0; c < DIM_FULL; ++c)
 		{
-			fprintf(stdout, "row: %d, col: %d | got: %hx, expected %hx", r, c, output[r][c], output_reference[r][c]);
-			fflush(stdout);
+			//fprintf(stdout, "row: %d, col: %d | got: %hx, expected %hx", r, c, output[r][c], output_reference[r][c]);
+			//fflush(stdout);
 			assert(output[r][c] == output_reference[r][c]);
-			fprintf(stdout, " [OK]\n");
+			//fprintf(stdout, " [OK]\n");
 		}
 	}
 
