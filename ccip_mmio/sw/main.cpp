@@ -57,7 +57,7 @@ typedef int8_t AB_TYPE;
 typedef int16_t C_TYPE;
 #define DIM 8
 #define MAX_VAL _UI16_MAX
-#define DEBUG true
+#define DEBUG false
 
 #define DIM_FULL 128
 
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 	auto finish = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> elapsed = finish - start;
 	fprintf(stdout, "Elapsed: %f\n", elapsed.count());
-	fprintf(stdout, "GOPS %f\n", (2*(DIM_FULL*DIM_FULL*DIM_FULL))/elapsed.count()/1000000000);
+	fprintf(stdout, "GOPS %f\n", (2*(DIM_FULL*DIM_FULL*DIM_FULL))/elapsed.count()/1000000);
 
 	// Compare.
 	fprintf(stdout, "Calculation finished. Testing values...\n");
