@@ -56,6 +56,8 @@ typedef int16_t C_TYPE;
 #define MAX_VAL _UI16_MAX
 #define DEBUG true
 
+#define DIM_FULL 8
+
 AB_TYPE A_vals[DIM][DIM];
 AB_TYPE B_vals[DIM][DIM];
 C_TYPE output[DIM][DIM];
@@ -176,8 +178,8 @@ int main(int argc, char *argv[]) {
     // the specified ID
     AFU afu(AFU_ACCEL_UUID);
 
-        // Seed random generator with "now"
-        timeval tv;
+    // Seed random generator with "now"
+    timeval tv;
 	gettimeofday(&tv, nullptr);
 	srand(tv.tv_usec);
 
@@ -196,14 +198,14 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "Calculating reference values of C...\n");
 	// Calculate reference C values.
-	for(int y_ind = 0; y_ind < DIM; ++y_ind)
+	for(int y_ind = 0; y_ind < DIM_FULL; ++y_ind)
 	{
-		for(int x_ind = 0; x_ind < DIM; ++x_ind)
+		for(int x_ind = 0; x_ind < DIM_FULL; ++x_ind)
 		{
 			// Calculate C
 			output_reference[y_ind][x_ind] = 0;
 
-			for(ptrdiff_t wh = 0; wh < DIM; ++wh)
+			for(ptrdiff_t wh = 0; wh < DIM_FULL; ++wh)
 			{
 				output_reference[y_ind][x_ind] += A_vals[y_ind][wh] * B_vals[wh][x_ind];
 			}
@@ -211,40 +213,45 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Now try it with the AFU.
-
-	// Write each value of A down.
-	fprintf(stdout, "Loading A into AFU...\n");
-	for(ptrdiff_t a_r = 0; a_r < DIM; ++a_r)
-	{
-		send_row_A(a_r, A_vals[a_r], afu);
-	}
-
-	// Push each value of B.
-	fprintf(stdout, "Loading B into AFU...\n");
-	for(ptrdiff_t b_r = 0; b_r < DIM; ++b_r)
-	{
-		send_row_B(b_r, B_vals[b_r], afu);
-	}
-
-	// Calculate
-	fprintf(stdout, "Performing Calculation...\n");
-	afu.write(0x0400, 100);
-	// Do we have to sleep?
-//	usleep(1000*1000);
-
-	// Read Values.
-	fprintf(stdout, "Reading Output from C...\n");
-
-	for(ptrdiff_t c_r = 0; c_r < DIM; ++c_r)
-	{
-		unpack_from_C(c_r, output[c_r], afu);
+	for (int i = 0; i < DIM_FULL; i+=DIM){
+		for (int j = 0; j < DIM_FULL; j+=DIM){
+			for (int k = 0; k < DIM_FULL; k+=DIM){
+				// Sending Block of C
+				for (int ii = 0; i < DIM; ii++){
+					C_TYPE* startC = output[i + ii] + j;
+					send_row_C(ii, startC, afu);
+				}
+				
+				// Sending Block A
+				for (int ii = 0; i < DIM; ii++){
+					AB_TYPE* startA = A_vals[i + ii] + k;
+					send_row_A(ii, startA, afu);
+				}
+				
+				// Sending Block B
+				for (int ii = 0; i < DIM; ii++){
+					AB_TYPE* startB = B_vals[K + ii] + j;
+					send_row_B(ii, startB, afu);
+				}
+				
+				// MATMUL
+				afu.write(0x0400, 0);
+				
+				// Retrieve vals
+				for (int ii = 0; i < DIM; i++){
+					C_TYPE* startC = output[i + ii] + j;
+					unpack_from_C(ii, startC, afu);
+				}
+				
+			}
+		}
 	}
 
 	// Compare.
 	fprintf(stdout, "Calculation finished. Testing values...\n");
-	for(int r = 0; r < DIM; ++r)
+	for(int r = 0; r < DIM_FULL; ++r)
 	{
-		for(int c = 0; c < DIM; ++c)
+		for(int c = 0; c < DIM_FULL; ++c)
 		{
 			fprintf(stdout, "row: %d, col: %d | got: %hx, expected %hx", r, c, output[r][c], output_reference[r][c]);
 			fflush(stdout);
