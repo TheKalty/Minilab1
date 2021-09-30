@@ -58,10 +58,10 @@ typedef int16_t C_TYPE;
 
 #define DIM_FULL 8
 
-AB_TYPE A_vals[DIM][DIM];
-AB_TYPE B_vals[DIM][DIM];
-C_TYPE output[DIM][DIM];
-C_TYPE output_reference[DIM][DIM];
+AB_TYPE A_vals[DIM_FULL][DIM_FULL];
+AB_TYPE B_vals[DIM_FULL][DIM_FULL];
+C_TYPE output[DIM_FULL][DIM_FULL];
+C_TYPE output_reference[DIM_FULL][DIM_FULL];
 
 // Reflect Endian
 template<int width, class BT> BT ref_end(BT in)
@@ -131,7 +131,7 @@ void send_row_C(uint16_t row, C_TYPE* vals, AFU& afu)
 	}
 
 	if(DEBUG)
-		fprintf(stdout, "CWRITE: low word, high word, address %lx | %lx @%lx @%lx\n", wds[0], wds[1], lw_addr, hw_addr);
+		fprintf(stdout, "CWRITE: low word, high word, address, row %lx | %lx @%lx @%lx | %u\n", wds[0], wds[1], lw_addr, hw_addr, row);
 
 	afu.write(lw_addr, wds[0]);
 	afu.write(hw_addr, wds[1]);
@@ -186,9 +186,9 @@ int main(int argc, char *argv[]) {
 	fprintf(stdout, "FULL SYSTEM TEST\n---------------\n");
 	fprintf(stdout, "Populating A and B...\n");
 	// Generate A vals, B vals.
-	for(int y_ind = 0; y_ind < DIM; ++y_ind)
+	for(int y_ind = 0; y_ind < DIM_FULL; ++y_ind)
 	{
-		for(int x_ind = 0; x_ind < DIM; ++x_ind)
+		for(int x_ind = 0; x_ind < DIM_FULL; ++x_ind)
 		{
 			A_vals[y_ind][x_ind] = static_cast<int8_t>(rand() % 255);
 			B_vals[y_ind][x_ind] = static_cast<int8_t>(rand() % 255);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 			for (int k = 0; k < DIM_FULL; k+=DIM){
 				// Sending Block of C
 				for (int ii = 0; i < DIM; ii++){
-					C_TYPE* startC = output[i + ii] + j;
+					C_TYPE* startC = outputoutput[i + ii] + j;
 					send_row_C(ii, startC, afu);
 				}
 				
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 				
 				// Sending Block B
 				for (int ii = 0; i < DIM; ii++){
-					AB_TYPE* startB = B_vals[K + ii] + j;
+					AB_TYPE* startB = B_vals[k + ii] + j;
 					send_row_B(ii, startB, afu);
 				}
 				
