@@ -56,7 +56,7 @@ typedef int16_t C_TYPE;
 #define MAX_VAL _UI16_MAX
 #define DEBUG true
 
-#define DIM_FULL 8
+#define DIM_FULL 128
 
 AB_TYPE A_vals[DIM_FULL][DIM_FULL];
 AB_TYPE B_vals[DIM_FULL][DIM_FULL];
@@ -215,34 +215,35 @@ int main(int argc, char *argv[]) {
 	// Now try it with the AFU.
 	for (int i = 0; i < DIM_FULL; i+=DIM){
 		for (int j = 0; j < DIM_FULL; j+=DIM){
-			for (int k = 0; k < DIM_FULL; k+=DIM){
-				// Sending Block of C
-				for (int ii = 0; i < DIM; ii++){
-					C_TYPE* startC = outputoutput[i + ii] + j;
-					send_row_C(ii, startC, afu);
-				}
+			
+			// Sending Block of C
+			for (int ii = 0; ii < DIM; ii++){
+				C_TYPE* startC = output[i + ii] + j;
+				send_row_C(ii, startC, afu);
+			}
 				
+				
+			for (int k = 0; k < DIM_FULL; k+=DIM){
 				// Sending Block A
-				for (int ii = 0; i < DIM; ii++){
+				for (int ii = 0; ii < DIM; ii++){
 					AB_TYPE* startA = A_vals[i + ii] + k;
 					send_row_A(ii, startA, afu);
 				}
 				
 				// Sending Block B
-				for (int ii = 0; i < DIM; ii++){
+				for (int ii = 0; ii < DIM; ii++){
 					AB_TYPE* startB = B_vals[k + ii] + j;
 					send_row_B(ii, startB, afu);
 				}
 				
 				// MATMUL
 				afu.write(0x0400, 0);
-				
-				// Retrieve vals
-				for (int ii = 0; i < DIM; i++){
-					C_TYPE* startC = output[i + ii] + j;
-					unpack_from_C(ii, startC, afu);
-				}
-				
+			}
+			
+			// Retrieve vals
+			for (int ii = 0; ii < DIM; ii++){
+				C_TYPE* startC = output[i + ii] + j;
+				unpack_from_C(ii, startC, afu);
 			}
 		}
 	}
